@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile & Settings — MediCare+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    .profile-layout { background: var(--bg-soft); min-height: 100vh; }
+
+    /* ── PROFILE HEADER ── */
+    .profile-banner {
+      background: linear-gradient(135deg, #0f1c2e, #1a3a5c);
+      height: 160px;
+      position: relative;
+    }
+    .profile-banner-actions {
+      position: absolute; top: 20px; right: 24px;
+      display: flex; gap: 10px;
+    }
+    .banner-btn {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .banner-btn-ghost { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .banner-btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+    .profile-identity {
+      padding: 0 40px;
+      display: flex; align-items: flex-end; gap: 24px;
+      margin-top: -52px;
+      margin-bottom: 32px;
+      position: relative; z-index: 1;
+    }
+    .profile-avatar-xl {
+      width: 104px; height: 104px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #0094ff, #00c4a0);
+      border: 4px solid #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+      box-shadow: 0 4px 20px rgba(0,148,255,0.25);
+      flex-shrink: 0;
+    }
+    .profile-identity-info { padding-bottom: 8px; }
+    .profile-identity-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text-dark); }
+    .profile-identity-meta { font-size: 14px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .profile-identity-meta span { display: flex; align-items: center; gap: 5px; }
+
+    /* ── SETTINGS LAYOUT ── */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 28px;
+      padding: 0 40px 40px;
+      max-width: 1100px;
+    }
+
+    .settings-nav {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      height: fit-content;
+      position: sticky;
+      top: 80px;
+    }
+    .snav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px; font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+    .snav-item:hover { background: var(--bg-soft); color: var(--text-dark); }
+    .snav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .snav-item .sicon { font-size: 17px; width: 22px; text-align: center; }
+    .snav-divider { height: 1px; background: var(--border); margin: 8px 4px; }
+
+    /* ── SETTINGS SECTIONS ── */
+    .settings-content { display: flex; flex-direction: column; gap: 24px; }
+
+    .settings-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .settings-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .settings-card-header h3 { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+    .settings-card-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .edit-toggle {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      background: var(--primary-light); color: var(--primary);
+      border: none; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .edit-toggle:hover { background: var(--primary); color: #fff; }
+    .settings-card-body { padding: 24px; }
+
+    /* Field rows */
+    .field-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .field-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .field-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .field-value { font-size: 14px; color: var(--text-dark); font-weight: 500; }
+    .field-value.empty { color: var(--text-light); font-style: italic; }
+    .field-input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text-dark);
+      outline: none; transition: border 0.2s;
+    }
+    .field-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,148,255,0.08); }
+    .field-input[readonly] { background: var(--bg-soft); color: var(--text-muted); cursor: not-allowed; }
+
+    .save-bar {
+      display: none;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-soft);
+    }
+    .save-bar.visible { display: flex; }
+    .save-btn { padding: 10px 24px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .save-btn:hover { background: var(--primary-dark); }
+    .discard-btn { padding: 10px 20px; background: #fff; color: var(--text-mid); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .discard-btn:hover { background: var(--border); }
+
+    /* Toggle switches */
+    .toggle-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+    .toggle-info p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .toggle-switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--border); border-radius: 13px;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 20px; height: 20px;
+      left: 3px; top: 3px;
+      background: #fff; border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* Danger zone */
+    .danger-zone { border-color: #fecaca; }
+    .danger-zone .settings-card-header { background: #fff5f5; border-bottom-color: #fecaca; }
+    .danger-zone .settings-card-header h3 { color: var(--danger); }
+    .danger-action {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #fecaca;
+    }
+    .danger-action:last-child { border-bottom: none; }
+    .danger-action h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+    .danger-action p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .danger-btn { padding: 9px 18px; background: #fff; color: var(--danger); border: 1.5px solid #fca5a5; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .danger-btn:hover { background: var(--danger); color: #fff; }
+
+    @media(max-width:900px){
+      .settings-layout { grid-template-columns: 1fr; padding: 0 20px 40px; }
+      .settings-nav { display: none; }
+      .profile-identity { padding: 0 20px; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: -40px; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="profile-layout">
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-brand">
+      <div class="nav-logo">M+</div>
+      <span>MediCare<strong>+</strong></span>
+    </a>
+    <div class="nav-links" id="navLinks"></div>
+    <div class="nav-actions">
+      <button onclick="logout()" style="padding:9px 18px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--danger)">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- BANNER -->
+  <div class="profile-banner">
+    <div class="profile-banner-actions">
+      <button class="banner-btn banner-btn-ghost" onclick="startEdit()">✏️ Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- IDENTITY ROW -->
+  <div class="profile-identity">
+    <div class="profile-avatar-xl" id="avatarXL">👤</div>
+    <div class="profile-identity-info">
+      <div class="profile-identity-name" id="identityName">Loading…</div>
+      <div class="profile-identity-meta" id="identityMeta"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="settings-layout">
+    <!-- NAV -->
+    <nav class="settings-nav">
+      <div class="snav-item active" onclick="scrollTo('personal')"><span class="sicon">👤</span> Personal Info</div>
+      <div class="snav-item" onclick="scrollTo('contact')"><span class="sicon">📞</span> Contact</div>
+      <div class="snav-item" onclick="scrollTo('professional')" id="proNavItem"><span class="sicon">🩺</span> Professional</div>
+      <div class="snav-divider"></div>
+      <div class="snav-item" onclick="scrollTo('notifications')"><span class="sicon">🔔</span> Notifications</div>
+      <div class="snav-item" onclick="scrollTo('security')"><span class="sicon">🔒</span> Security</div>
+      <div class="snav-divider"></div>
+      <div class="snav-item" onclick="scrollTo('danger')" style="color:var(--danger)"><span class="sicon">⚠️</span> Danger Zone</div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="settings-content">
+
+      <!-- PERSONAL INFO -->
+      <div class="settings-card" id="personal">
+        <div class="settings-card-header">
+          <div>
+            <h3>Personal Information</h3>
+            <p>Your basic profile details visible to doctors and patients</p>
+          </div>
+          <button class="edit-toggle" onclick="startEdit()">✏️ Edit</button>
+        </div>
+        <div class="settings-card-body" id="personalBody">
+          <!-- populated by JS -->
+        </div>
+        <div class="save-bar" id="personalSaveBar">
+          <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+          <button class="discard-btn" onclick="discardEdit()">Discard</button>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="settings-card" id="contact">
+        <div class="settings-card-header">
+          <div>
+            <h3>Contact Details</h3>
+            <p>How we reach you for appointment updates</p>
+          </div>
+        </div>
+        <div class="settings-card-body" id="contactBody"></div>
+      </div>
+
+      <!-- PROFESSIONAL (doctor only) -->
+      <div class="settings-card" id="professional" style="display:none">
+        <div class="settings-card-header">
+          <div>
+            <h3>Professional Details</h3>
+            <p>Medical credentials and practice information</p>
+          </div>
+        </div>
+        <div class="settings-card-body" id="professionalBody"></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="settings-card" id="notifications">
+        <div class="settings-card-header">
+          <div>
+            <h3>Notification Preferences</h3>
+            <p>Control how and when we contact you</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="toggle-row">
+            <div class="toggle-info"><h4>Appointment Reminders</h4><p>Receive reminders 24 hours before your appointment</p></div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><h4>SMS Notifications</h4><p>Get text messages for booking confirmations</p></div>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><h4>Email Updates</h4><p>Weekly health tips and platform updates</p></div>
+            <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><h4>Promotional Messages</h4><p>Special offers and new doctor announcements</p></div>
+            <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="settings-card" id="security">
+        <div class="settings-card-header">
+          <div>
+            <h3>Security & Password</h3>
+            <p>Keep your account safe and secure</p>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="form-group"><label>Current Password</label><input type="password" class="field-input" placeholder="Enter current password"></div>
+          <div class="form-row">
+            <div class="form-group"><label>New Password</label><input type="password" class="field-input" placeholder="New password"></div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" class="field-input" placeholder="Repeat new password"></div>
+          </div>
+          <button onclick="savePassword()" style="padding:11px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px">Update Password</button>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="settings-card danger-zone" id="danger">
+        <div class="settings-card-header"><div><h3>⚠️ Danger Zone</h3><p>Irreversible actions — proceed with caution</p></div></div>
+        <div class="settings-card-body">
+          <div class="danger-action">
+            <div><h4>Deactivate Account</h4><p>Temporarily disable your account. You can reactivate anytime.</p></div>
+            <button class="danger-btn">Deactivate</button>
+          </div>
+          <div class="danger-action">
+            <div><h4>Download My Data</h4><p>Get a copy of all your health records and appointment history.</p></div>
+            <button class="danger-btn" style="color:var(--primary);border-color:#93c5fd" onclick="downloadData()">Download</button>
+          </div>
+          <div class="danger-action">
+            <div><h4>Delete Account</h4><p>Permanently delete your account and all associated data. This cannot be undone.</p></div>
+            <button class="danger-btn" onclick="confirmDelete()">Delete Account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const role = localStorage.getItem('demoRole') || 'patient';
+    const user = JSON.parse(localStorage.getItem('demoUser') || '{}');
+    const name = user.name || (role === 'doctor' ? 'Doctor' : 'Patient');
+
+    // Set identity
+    document.getElementById('avatarXL').textContent = role === 'doctor' ? '👨‍⚕️' : '🧑‍💼';
+    document.getElementById('identityName').textContent = (role === 'doctor' ? 'Dr. ' : '') + name;
+    document.getElementById('identityMeta').innerHTML = `
+      <span>✉️ ${user.email || 'user@example.com'}</span>
+      <span class="badge ${role==='doctor'?'badge-doctor':'badge-patient'}" style="padding:3px 10px;border-radius:20px">${role==='doctor'?'Doctor':'Patient'}</span>
+      <span>📅 Member since 2025</span>
+    `;
+
+    // Nav links
+    document.getElementById('navLinks').innerHTML = role === 'doctor'
+      ? `<a href="dashboard-doctor.html">Dashboard</a><a href="appointments.html">Appointments</a>`
+      : `<a href="dashboard-patient.html">Dashboard</a><a href="appointments.html">Appointments</a><a href="doctors.html">Find Doctors</a>`;
+
+    // Professional section visibility
+    if (role === 'doctor') document.getElementById('professional').style.display = 'block';
+    else document.getElementById('proNavItem').style.display = 'none';
+
+    // ── PROFILE DATA ──
+    let profileData = {
+      firstName: name.split(' ')[0] || '',
+      lastName: name.split(' ').slice(1).join(' ') || '',
+      email: user.email || '',
+      phone: '+91 98765 43210',
+      dob: '1990-05-15',
+      gender: 'Male',
+      bloodGroup: 'O+',
+      bio: role === 'doctor' ? 'Experienced specialist dedicated to exceptional patient care.' : 'Taking proactive steps towards better health.',
+      address: 'Mathura, Uttar Pradesh',
+      emergency: '+91 91234 56789',
+      specialty: 'Cardiologist',
+      license: 'MCI-2024-12345',
+      experience: '10',
+      hospital: 'Apollo Hospital',
+      fee: '500',
+    };
+
+    let isEditing = false;
+
+    function renderPersonal() {
+      const fields = [
+        ['First Name', 'firstName'], ['Last Name', 'lastName'],
+        ['Date of Birth', 'dob'], ['Gender', 'gender'], ['Blood Group', 'bloodGroup'],
+        ['Bio', 'bio']
+      ];
+      document.getElementById('personalBody').innerHTML = fields.map(([label, key]) => `
+        <div class="field-row">
+          <div class="field-label">${label}</div>
+          ${isEditing
+            ? `<input class="field-input" value="${profileData[key]||''}" oninput="profileData['${key}']=this.value">`
+            : `<div class="field-value ${profileData[key]?'':'empty'}">${profileData[key]||'Not set'}</div>`
+          }
+        </div>`).join('');
+      document.getElementById('personalSaveBar').classList.toggle('visible', isEditing);
+    }
+
+    function renderContact() {
+      const fields = role === 'patient'
+        ? [['Email', 'email', true], ['Phone', 'phone'], ['Address', 'address'], ['Emergency Contact', 'emergency']]
+        : [['Email', 'email', true], ['Phone', 'phone'], ['Hospital / Clinic', 'hospital']];
+      document.getElementById('contactBody').innerHTML = fields.map(([label, key, ro]) => `
+        <div class="field-row">
+          <div class="field-label">${label}</div>
+          <div class="field-value">${profileData[key]||'Not set'}</div>
+        </div>`).join('');
+    }
+
+    function renderProfessional() {
+      if (role !== 'doctor') return;
+      const fields = [['Specialization', 'specialty'], ['License No.', 'license'], ['Years of Experience', 'experience'], ['Hospital/Clinic', 'hospital'], ['Consultation Fee (₹)', 'fee']];
+      document.getElementById('professionalBody').innerHTML = fields.map(([label, key]) => `
+        <div class="field-row">
+          <div class="field-label">${label}</div>
+          <div class="field-value">${profileData[key]||'Not set'}</div>
+        </div>`).join('');
+    }
+
+    function startEdit() {
+      isEditing = true;
+      renderPersonal();
+      // Scroll to personal section
+      document.getElementById('personal').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function saveProfile() {
+      isEditing = false;
+      renderPersonal();
+      renderContact();
+      // Update identity
+      document.getElementById('identityName').textContent = (role === 'doctor' ? 'Dr. ' : '') + profileData.firstName + ' ' + profileData.lastName;
+      showToast('Profile updated successfully! ✓', 'success');
+    }
+
+    function discardEdit() {
+      isEditing = false;
+      renderPersonal();
+    }
+
+    function savePassword() {
+      showToast('Password updated successfully! 🔒', 'success');
+    }
+
+    function downloadData() {
+      const data = {
+        profile: profileData,
+        appointments: JSON.parse(localStorage.getItem('patientAppts') || '[]'),
+        exportedAt: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'medicare-data.json'; a.click();
+      URL.revokeObjectURL(url);
+      showToast('Data downloaded!', 'success');
+    }
+
+    function confirmDelete() {
+      if (confirm('Are you absolutely sure? This will permanently delete your account.')) {
+        showToast('Account deletion requested. You will be logged out.', 'error');
+        setTimeout(logout, 2000);
+      }
+    }
+
+    function scrollTo(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.snav-item').forEach(i => i.classList.remove('active'));
+      event.target.closest('.snav-item').classList.add('active');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('demoRole');
+      localStorage.removeItem('demoUser');
+      window.location.href = 'login.html';
+    }
+
+    function showToast(msg, type='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' toast-'+type : '');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // Initial render
+    renderPersonal();
+    renderContact();
+    renderProfessional();
+  </script>
+</body>
+</html>

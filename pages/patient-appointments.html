@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Appointments — MediCare+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    .summary-banner {
+      background: linear-gradient(135deg, #0f1c2e 0%, #1b3f68 100%);
+      border-radius: var(--radius-xl);
+      padding: 28px 30px;
+      margin-bottom: 26px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+    .summary-banner::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,196,160,0.2) 0%, transparent 60%);
+    }
+    .summary-title {
+      font-family: 'DM Serif Display', serif;
+      color: #fff;
+      font-size: 30px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+    .summary-sub {
+      color: #9ebad4;
+      font-size: 14px;
+      max-width: 520px;
+      position: relative;
+      z-index: 1;
+    }
+    .summary-meta {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+    .summary-actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cta-btn {
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cta-primary {
+      background: #fff;
+      color: #0f1c2e;
+    }
+    .cta-primary:hover { background: #e8f4ff; }
+    .cta-ghost {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .cta-ghost:hover { background: rgba(255,255,255,0.2); }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .filter-btn {
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .filter-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .appointments-list {
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    .appt-item {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: #fff;
+      transition: all 0.2s;
+    }
+    .appt-item:hover {
+      border-color: #c4d8ef;
+      box-shadow: var(--shadow-sm);
+    }
+    .appt-main {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .appt-doc {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .appt-spec {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .appt-meta {
+      display: grid;
+      gap: 2px;
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+    .appt-reason {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+    .appt-reason strong {
+      color: var(--text-dark);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-right: 5px;
+    }
+    .appt-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .helper-note {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 38px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      border: 1.5px dashed var(--border-mid);
+      border-radius: var(--radius-md);
+      background: #fbfdff;
+    }
+    .empty-state strong {
+      display: block;
+      color: var(--text-dark);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .mobile-shortcuts {
+      display: none;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .mobile-shortcuts a {
+      font-size: 12px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      background: #fff;
+    }
+    .mobile-shortcuts a.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    @media(max-width: 1120px) {
+      .appt-main {
+        grid-template-columns: 1fr;
+      }
+      .appt-actions {
+        justify-content: flex-start;
+      }
+      .filter-row {
+        justify-content: flex-start;
+        margin-top: 10px;
+      }
+      .table-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media(max-width: 900px) {
+      .summary-banner {
+        grid-template-columns: 1fr;
+      }
+      .summary-actions {
+        width: 100%;
+      }
+      .summary-actions .cta-btn {
+        flex: 1;
+      }
+      .mobile-shortcuts {
+        display: flex;
+      }
+      .appointments-list {
+        padding: 16px;
+      }
+      .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-page">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-logo">M+</div>
+          <span>MediCare<strong>+</strong></span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard-patient.html"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="dashboard-patient.html"><span class="nav-icon">📅</span> Book Appointment</a>
+        <a href="patient-appointments.html" class="active"><span class="nav-icon">📋</span> My Appointments</a>
+        <a href="doctors.html"><span class="nav-icon">🩺</span> Find Doctors</a>
+        <a href="profile.html"><span class="nav-icon">⚙️</span> Profile &amp; Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar-sm">🧑‍💼</div>
+          <div>
+            <div class="user-name-sm" id="sidebarName">Patient</div>
+            <div class="user-role-sm">Patient Account</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>My Appointments</h1>
+        <p>Track upcoming visits, completed consultations, and cancellations in one clear timeline.</p>
+      </div>
+
+      <div class="mobile-shortcuts">
+        <a href="dashboard-patient.html">Dashboard</a>
+        <a href="doctors.html">Find Doctors</a>
+        <a href="patient-appointments.html" class="active">Appointments</a>
+      </div>
+
+      <section class="summary-banner" data-animate>
+        <div>
+          <h2 class="summary-title">Care Plan For <span id="bannerName">Patient</span></h2>
+          <p class="summary-sub">Your appointment history is kept in one place so you can quickly revisit treatment timelines and upcoming doctor visits.</p>
+          <div class="summary-meta" id="nextVisit">No upcoming appointment yet</div>
+        </div>
+        <div class="summary-actions">
+          <a href="doctors.html" class="cta-btn cta-primary">Find a Doctor</a>
+          <a href="dashboard-patient.html" class="cta-btn cta-ghost">Book New</a>
+        </div>
+      </section>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#e8f4ff">📅</div>
+          <div class="stat-card-val" id="totalCount">0</div>
+          <div class="stat-card-label">Total Appointments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#fef3c7">⏳</div>
+          <div class="stat-card-val" id="scheduledCount">0</div>
+          <div class="stat-card-label">Scheduled</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#e6f9f1">✅</div>
+          <div class="stat-card-val" id="completedCount">0</div>
+          <div class="stat-card-label">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#fef2f2">❌</div>
+          <div class="stat-card-val" id="cancelledCount">0</div>
+          <div class="stat-card-label">Cancelled</div>
+        </div>
+      </div>
+
+      <section class="table-card" data-animate-delay>
+        <div class="table-card-header">
+          <h3>Appointment Timeline</h3>
+          <div class="filter-row" id="filterRow">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="scheduled">Scheduled</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+            <button class="filter-btn" data-filter="cancelled">Cancelled</button>
+          </div>
+        </div>
+        <div id="apptList" class="appointments-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const role = localStorage.getItem('demoRole');
+    if (role !== 'patient') {
+      alert('Access denied');
+      window.location.href = 'login.html';
+    }
+
+    const user = JSON.parse(localStorage.getItem('demoUser') || '{}');
+    const userName = user.name || 'Patient';
+    document.getElementById('sidebarName').textContent = userName;
+    document.getElementById('bannerName').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+    const storageKey = 'patientAppts';
+    let appointments = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    let activeFilter = 'all';
+
+    if (appointments.length === 0) {
+      appointments = [
+        {
+          id: 1,
+          doctor: 'Dr. Priya Sharma',
+          specialty: 'Neurologist',
+          date: '2026-04-25',
+          time: '10:00 AM',
+          reason: 'Migraine follow-up and treatment planning.',
+          status: 'scheduled'
+        },
+        {
+          id: 2,
+          doctor: 'Dr. Arjun Mehta',
+          specialty: 'Cardiologist',
+          date: '2026-04-10',
+          time: '2:00 PM',
+          reason: 'Routine heart checkup and blood pressure review.',
+          status: 'completed'
+        }
+      ];
+      localStorage.setItem(storageKey, JSON.stringify(appointments));
+    }
+
+    function toDateValue(appt) {
+      const datePart = appt.date || '';
+      const timePart = appt.time || '12:00 PM';
+      const withTime = new Date(`${datePart} ${timePart}`);
+      if (!Number.isNaN(withTime.getTime())) return withTime.getTime();
+      const dateOnly = new Date(datePart);
+      return Number.isNaN(dateOnly.getTime()) ? 0 : dateOnly.getTime();
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return dateStr || 'Date not set';
+      return d.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    function statusBadge(status) {
+      if (status === 'completed') return 'badge-completed';
+      if (status === 'cancelled') return 'badge-cancelled';
+      return 'badge-scheduled';
+    }
+
+    function saveAppointments() {
+      localStorage.setItem(storageKey, JSON.stringify(appointments));
+    }
+
+    function renderStats() {
+      const scheduled = appointments.filter(a => a.status === 'scheduled');
+      const completed = appointments.filter(a => a.status === 'completed');
+      const cancelled = appointments.filter(a => a.status === 'cancelled');
+
+      document.getElementById('totalCount').textContent = appointments.length;
+      document.getElementById('scheduledCount').textContent = scheduled.length;
+      document.getElementById('completedCount').textContent = completed.length;
+      document.getElementById('cancelledCount').textContent = cancelled.length;
+
+      const next = [...scheduled].sort((a, b) => toDateValue(a) - toDateValue(b))[0];
+      document.getElementById('nextVisit').textContent = next
+        ? `Next visit: ${next.doctor} on ${formatDate(next.date)} at ${next.time || 'TBD'}`
+        : 'No upcoming appointment yet';
+    }
+
+    function renderList() {
+      const container = document.getElementById('apptList');
+      const filtered = appointments
+        .filter(a => activeFilter === 'all' || a.status === activeFilter)
+        .sort((a, b) => toDateValue(b) - toDateValue(a));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <strong>No appointments in this category.</strong>
+            Try switching filters or book a fresh appointment from your dashboard.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(a => `
+        <article class="appt-item">
+          <div class="appt-main">
+            <div>
+              <div class="appt-doc">${a.doctor || 'Doctor not assigned'}</div>
+              <div class="appt-spec">${a.specialty || 'General Consultation'}</div>
+            </div>
+
+            <div class="appt-meta">
+              <span>📅 ${formatDate(a.date)}</span>
+              <span>🕐 ${a.time || 'Time not set'}</span>
+              <span><span class="badge ${statusBadge(a.status)}">${a.status || 'scheduled'}</span></span>
+            </div>
+
+            <div class="appt-actions">
+              ${a.status === 'scheduled'
+                ? `<button class="action-btn action-btn-danger" onclick="cancelAppt(${a.id})">Cancel Appointment</button>`
+                : '<span class="helper-note">No action needed</span>'}
+            </div>
+          </div>
+
+          <p class="appt-reason"><strong>Reason:</strong>${a.reason || 'Not provided'}</p>
+        </article>
+      `).join('');
+    }
+
+    function cancelAppt(id) {
+      const idx = appointments.findIndex(a => Number(a.id) === Number(id));
+      if (idx === -1) return;
+
+      if (!confirm('Cancel this appointment?')) return;
+
+      appointments[idx].status = 'cancelled';
+      saveAppointments();
+      renderStats();
+      renderList();
+      showToast('Appointment cancelled.', 'error');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('demoRole');
+      localStorage.removeItem('demoUser');
+      window.location.href = 'login.html';
+    }
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' toast-' + type : '');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    document.querySelectorAll('#filterRow .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#filterRow .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderList();
+      });
+    });
+
+    renderStats();
+    renderList();
+  </script>
+</body>
+</html>

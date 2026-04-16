@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Dashboard — MediCare+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    .welcome-card {
+      background: linear-gradient(135deg, #0b3d20 0%, #0f5c32 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-card::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 60%);
+    }
+    .welcome-name { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; }
+    .welcome-date { font-size: 14px; color: #7acca0; margin-top: 6px; }
+    .quick-actions { display: flex; gap: 10px; margin-top: 20px; position: relative; z-index: 1; }
+    .qbtn { padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; font-family: inherit; }
+    .qbtn-white { background: #fff; color: #0b3d20; }
+    .qbtn-white:hover { background: #e6f9f1; }
+    .qbtn-ghost { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .qbtn-ghost:hover { background: rgba(255,255,255,0.15); }
+    .welcome-illustration { font-size: 80px; opacity: 0.85; position: relative; z-index: 1; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .profile-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .profile-avatar-lg {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 14px;
+    }
+    .profile-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text-dark); }
+    .profile-spec { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .ps-item { padding: 12px 8px; background: var(--bg-soft); border-radius: var(--radius-sm); }
+    .ps-val { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text-dark); }
+    .ps-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .profile-edit-btn { 
+      display: block; width: 100%; margin-top: 18px;
+      padding: 10px; border-radius: var(--radius-sm);
+      background: var(--success-light); color: var(--success);
+      border: none; font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .profile-edit-btn:hover { background: var(--success); color: #fff; }
+
+    /* Update appointment status */
+    .status-select {
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      background: #fff;
+      color: var(--text-dark);
+    }
+    .status-select:focus { outline: none; border-color: var(--primary); }
+  </style>
+</head>
+<body>
+  <div class="dashboard-page">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-logo">M+</div>
+          <span>MediCare<strong>+</strong></span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="doctor-appointments.html"><span class="nav-icon">📋</span> Appointments</a>
+        <a href="#"><span class="nav-icon">📝</span> Prescriptions</a>
+        <a href="#"><span class="nav-icon">💬</span> Messages</a>
+        <a href="#"><span class="nav-icon">📊</span> Analytics</a>
+        <a href="profile.html"><span class="nav-icon">⚙️</span> Profile &amp; Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar-sm">👨‍⚕️</div>
+          <div>
+            <div class="user-name-sm" id="sidebarName">Doctor</div>
+            <div class="user-role-sm">Doctor Account</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <!-- Welcome -->
+      <div class="welcome-card" data-animate>
+        <div style="position:relative;z-index:1">
+          <div class="welcome-name">Good morning, Doctor <span id="welcomeName"></span>👋</div>
+          <div class="welcome-date" id="welcomeDate"></div>
+          <div class="quick-actions">
+            <a href="doctor-appointments.html" class="qbtn qbtn-white">📋 Manage Appointments</a>
+            <a href="profile.html" class="qbtn qbtn-ghost">⚙️ Edit Profile</a>
+          </div>
+        </div>
+        <div class="welcome-illustration">🩺</div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#e6f9f1">📅</div>
+          <div class="stat-card-val" id="todayCount">0</div>
+          <div class="stat-card-label">Today's Appointments</div>
+          <div class="stat-card-trend trend-up" id="todayTrend"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#e8f4ff">👥</div>
+          <div class="stat-card-val" id="totalPatients">0</div>
+          <div class="stat-card-label">Total Patients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#fef3c7">⏳</div>
+          <div class="stat-card-val" id="pendingCount">0</div>
+          <div class="stat-card-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:#ede9fe">⭐</div>
+          <div class="stat-card-val">4.9</div>
+          <div class="stat-card-label">Patient Rating</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <!-- All Appointments -->
+          <div class="table-card">
+            <div class="table-card-header">
+              <h3>All Appointments</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Date & Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="docApptBody">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:30px">No appointments yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COL -->
+        <div>
+          <!-- Doctor Profile Card -->
+          <div class="profile-card">
+            <div class="profile-avatar-lg">👨‍⚕️</div>
+            <div class="profile-name" id="profileName">Dr. Doctor</div>
+            <div class="profile-spec" id="profileSpec">Specialist · MediCare+</div>
+            <div style="display:flex;justify-content:center;gap:4px;margin-top:8px;color:#f59e0b;font-size:14px">★★★★★</div>
+            <div class="profile-stats">
+              <div class="ps-item">
+                <div class="ps-val" id="profileTotal">0</div>
+                <div class="ps-lbl">Appointments</div>
+              </div>
+              <div class="ps-item">
+                <div class="ps-val" id="profilePatients">0</div>
+                <div class="ps-lbl">Patients</div>
+              </div>
+              <div class="ps-item">
+                <div class="ps-val">10</div>
+                <div class="ps-lbl">Yrs Exp</div>
+              </div>
+            </div>
+            <button class="profile-edit-btn">✏️ Edit Profile</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let user = JSON.parse(localStorage.getItem('demoUser') || '{}');
+    const name = user.name || 'Doctor';
+    document.getElementById('welcomeName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+    document.getElementById('sidebarName').textContent = 'Dr. ' + name;
+    document.getElementById('profileName').textContent = 'Dr. ' + name;
+
+    const now = new Date();
+    document.getElementById('welcomeDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Simulated doctor appointments (in real app, fetched from API)
+    const mockAppointments = [
+      { patient: 'Rahul Gupta', avatar: '🧑', date: new Date().toISOString().split('T')[0], time: '9:00 AM', reason: 'Chest pain & shortness of breath', status: 'scheduled' },
+      { patient: 'Anita Sharma', avatar: '👩', date: new Date().toISOString().split('T')[0], time: '10:30 AM', reason: 'Routine cardiac checkup', status: 'scheduled' },
+      { patient: 'Vikram Singh', avatar: '👨', date: new Date(Date.now()-86400000).toISOString().split('T')[0], time: '2:00 PM', reason: 'Follow-up after ECG', status: 'completed' },
+      { patient: 'Preethi Nair', avatar: '👩', date: new Date(Date.now()-172800000).toISOString().split('T')[0], time: '11:00 AM', reason: 'Hypertension management', status: 'completed' },
+    ];
+
+    function renderDoctorDashboard() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayAppts = mockAppointments.filter(a => a.date === today);
+      const pending = mockAppointments.filter(a => a.status === 'scheduled');
+      const uniquePatients = [...new Set(mockAppointments.map(a => a.patient))];
+
+      document.getElementById('todayCount').textContent = todayAppts.length;
+      document.getElementById('totalPatients').textContent = uniquePatients.length;
+      document.getElementById('pendingCount').textContent = pending.length;
+      document.getElementById('profileTotal').textContent = mockAppointments.length;
+      document.getElementById('profilePatients').textContent = uniquePatients.length;
+
+      // All appointments table
+      document.getElementById('docApptBody').innerHTML = mockAppointments.map((a, i) => `
+        <tr>
+          <td><strong>${a.patient}</strong></td>
+          <td>${new Date(a.date).toLocaleDateString('en-IN')}<br><span style="font-size:12px;color:var(--text-muted)">${a.time}</span></td>
+          <td>${a.reason}</td>
+          <td><span class="badge badge-${a.status}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+          <td>
+            ${a.status === 'scheduled' ? `
+              <select class="status-select" onchange="updateStatus(${i}, this.value)">
+                <option value="">Update</option>
+                <option value="completed">✅ Complete</option>
+                <option value="cancelled">❌ Cancel</option>
+              </select>
+            ` : '—'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateStatus(i, status) {
+      if (!status) return;
+      mockAppointments[i].status = status;
+      renderDoctorDashboard();
+      showToast(`Appointment marked as ${status}.`, status === 'completed' ? 'success' : 'error');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('demoRole');
+      localStorage.removeItem('demoUser');
+      window.location.href = 'login.html';
+    }
+
+    function showToast(msg, type='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' toast-'+type : '');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    renderDoctorDashboard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — MediCare+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    .success-banner {
+      background: var(--success-light);
+      border: 1px solid #a7f3d0;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #065f46;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .success-banner.show { display: flex; }
+
+    .or-social { display: flex; flex-direction: column; gap: 10px; }
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .social-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+
+    .forgot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .remember-me { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+    .remember-me input { accent-color: var(--primary); }
+    .forgot-link { font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600; }
+    .forgot-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="nav-brand">
+      <div class="nav-logo">M+</div>
+      <span>MediCare<strong>+</strong></span>
+    </a>
+    <div></div>
+    <div class="nav-actions">
+      <a href="register.html" class="nav-link-btn">New here? <strong>Create account</strong></a>
+    </div>
+  </nav>
+
+  <div class="auth-page">
+    <!-- LEFT -->
+    <div class="auth-left">
+      <div class="brand-mark">
+        <div class="nav-logo">M+</div>
+        <span>MediCare<strong>+</strong></span>
+      </div>
+      <h2>Welcome<br>Back</h2>
+      <p>Sign in to access your dashboard, manage appointments, and continue your healthcare journey.</p>
+      <div class="auth-trust" style="margin-top:52px">
+        <div class="trust-item">
+          <div class="trust-icon">🏥</div>
+          <div class="trust-text">500+ verified specialist doctors</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">📅</div>
+          <div class="trust-text">Real-time appointment scheduling</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <div class="trust-text">Bank-grade security for your health data</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="auth-right">
+      <div class="auth-form-box">
+        <h1>Sign In</h1>
+        <p class="subtitle">Don't have an account? <a href="register.html">Register for free</a></p>
+
+        <!-- Success banner (shows after registration) -->
+        <div class="success-banner" id="successBanner">
+          <span style="font-size:18px">🎉</span>
+          <span>Account created successfully! Please sign in.</span>
+        </div>
+
+        <!-- Role Tabs -->
+        <div class="role-tabs" id="loginRoleTabs" style="margin-bottom:24px">
+          <div class="role-tab active" data-role="patient" onclick="setLoginRole('patient')">
+            <span class="role-tab-icon">🧑‍💼</span>
+            <div class="role-tab-label">Patient</div>
+            <div class="role-tab-sub">Access patient portal</div>
+          </div>
+          <div class="role-tab" data-role="doctor" onclick="setLoginRole('doctor')">
+            <span class="role-tab-icon">👨‍⚕️</span>
+            <div class="role-tab-label">Doctor</div>
+            <div class="role-tab-sub">Access doctor portal</div>
+          </div>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input type="email" data-icon id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="form-error" id="emailErr">Please enter a valid email.</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔑</span>
+              <input type="password" data-icon id="loginPwd" placeholder="Your password" required autocomplete="current-password">
+              <button type="button" class="input-icon-right" onclick="togglePwd()">👁</button>
+            </div>
+            <div class="form-error" id="pwdErr">Incorrect password. Try again.</div>
+          </div>
+
+          <div class="forgot-row">
+            <label class="remember-me">
+              <input type="checkbox" id="remember"> Remember me
+            </label>
+            <a href="#" class="forgot-link" onclick="showForgot(event)">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="loginBtn">Sign In →</button>
+
+          <div class="divider">or continue with</div>
+
+          <div class="or-social">
+            <button type="button" class="social-btn">
+              <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+              Continue with Google
+            </button>
+          </div>
+        </form>
+
+        <p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:24px">
+          By signing in you agree to our <a href="#" style="color:var(--primary)">Terms</a> and <a href="#" style="color:var(--primary)">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let loginRole = 'patient';
+
+    // Show success banner if redirected from registration
+    if (new URLSearchParams(location.search).get('registered') === '1') {
+      document.getElementById('successBanner').classList.add('show');
+    }
+
+    function setLoginRole(role) {
+      loginRole = role;
+      document.querySelectorAll('#loginRoleTabs .role-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`#loginRoleTabs .role-tab[data-role="${role}"]`).classList.add('active');
+    }
+
+    function togglePwd() {
+      const inp = document.getElementById('loginPwd');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function showForgot(e) {
+      e.preventDefault();
+      showToast('Password reset email sent! (Demo mode)', 'success');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pwd = document.getElementById('loginPwd').value;
+      const btn = document.getElementById('loginBtn');
+
+      if (!email || !pwd) { showToast('Please fill in all fields.', 'error'); return; }
+      btn.textContent = 'Signing in...';
+      btn.classList.add('loading');
+
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pwd, role: loginRole })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          const user = data.user || {};
+          const resolvedRole = user.role || loginRole;
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userRole', resolvedRole);
+          localStorage.setItem("demoRole", resolvedRole); // doctor or patient
+          localStorage.setItem("demoUser", JSON.stringify(user));
+          showToast('Welcome back! Redirecting...', 'success');
+          setTimeout(() => window.location.href = `dashboard-${resolvedRole}.html`, 1200);
+        } else {
+          showToast(data.error || 'Invalid credentials.', 'error');
+          btn.textContent = 'Sign In →';
+          btn.classList.remove('loading');
+        }
+      } catch(err) {
+        // Demo mode
+        localStorage.setItem('demoRole', loginRole);
+        localStorage.setItem('demoUser', JSON.stringify({ name: email.split('@')[0], email, role: loginRole }));
+        showToast('Signed in! (Demo mode)', 'success');
+        setTimeout(() => window.location.href = `dashboard-${loginRole}.html`, 1200);
+        btn.textContent = 'Sign In →';
+        btn.classList.remove('loading');
+      }
+    });
+
+    function showToast(msg, type='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' toast-'+type : '');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

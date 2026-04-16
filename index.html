@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCare+ | Doctor Appointment System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 92vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 60px;
+      padding: 80px 80px 60px;
+      background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f5fdf8 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,149,255,0.07) 0%, transparent 70%);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: 30%;
+      width: 350px; height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e8f5e9;
+      color: #1a9e5a;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    .hero-badge span { font-size: 16px; }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(42px, 4.5vw, 64px);
+      line-height: 1.1;
+      color: #0f1c2e;
+      margin-bottom: 22px;
+    }
+    .hero h1 em { color: #0094ff; font-style: italic; }
+    .hero p {
+      font-size: 17px;
+      color: #5a6a7e;
+      line-height: 1.7;
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: #0094ff;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0,148,255,0.25);
+    }
+    .btn-primary:hover { background: #007de0; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,148,255,0.35); }
+    .btn-outline {
+      background: #fff;
+      color: #0f1c2e;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      border: 1.5px solid #dde4ef;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: #0094ff; color: #0094ff; }
+
+    /* Hero Illustration */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-card-stack {
+      position: relative;
+      width: 380px;
+      height: 420px;
+    }
+    .hcard {
+      position: absolute;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(15,28,46,0.10);
+      padding: 24px;
+    }
+    .hcard-main {
+      width: 320px;
+      top: 40px; left: 30px;
+      z-index: 3;
+    }
+    .hcard-back {
+      width: 300px;
+      top: 10px; left: 50px;
+      z-index: 1;
+      background: linear-gradient(135deg, #0094ff 0%, #00c4a0 100%);
+      opacity: 0.15;
+      height: 200px;
+    }
+    .doc-info { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .doc-avatar {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0094ff, #00c4a0);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .doc-name { font-weight: 600; color: #0f1c2e; font-size: 16px; }
+    .doc-spec { font-size: 13px; color: #7a8fa6; }
+    .rating { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+    .rating span { font-size: 13px; color: #f59e0b; }
+    .rating-num { font-size: 12px; color: #7a8fa6; }
+    .appt-times {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .time-slot {
+      padding: 8px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: #f0f7ff;
+      color: #0094ff;
+      cursor: pointer;
+    }
+    .time-slot.active { background: #0094ff; color: #fff; }
+    /* Small floating cards */
+    .hcard-mini {
+      position: absolute;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(15,28,46,0.10);
+      padding: 14px 18px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hcard-stats { bottom: 60px; right: -10px; }
+    .hcard-booked { top: 10px; right: 20px; }
+    .mini-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .mini-icon.green { background: #e6f9f1; }
+    .mini-icon.blue { background: #e8f4ff; }
+    .mini-label { font-size: 11px; color: #7a8fa6; }
+    .mini-val { font-size: 16px; font-weight: 700; color: #0f1c2e; }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      background: #0f1c2e;
+      padding: 36px 80px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .stat-item { text-align: center; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 36px; color: #fff; }
+    .stat-num span { color: #0094ff; }
+    .stat-label { font-size: 13px; color: #7a9ab8; margin-top: 4px; }
+
+    /* ===== FEATURES ===== */
+    .section { padding: 80px; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 40px; color: #0f1c2e; margin-bottom: 14px; }
+    .section-header p { color: #5a6a7e; font-size: 16px; max-width: 520px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .feature-card {
+      background: #fff;
+      border: 1.5px solid #eef2f8;
+      border-radius: 18px;
+      padding: 32px 28px;
+      transition: all 0.25s;
+    }
+    .feature-card:hover { border-color: #0094ff; box-shadow: 0 8px 32px rgba(0,148,255,0.10); transform: translateY(-3px); }
+    .feat-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .feat-icon.blue { background: #e8f4ff; }
+    .feat-icon.green { background: #e6f9f1; }
+    .feat-icon.purple { background: #f0eaff; }
+    .feature-card h3 { font-size: 18px; font-weight: 600; color: #0f1c2e; margin-bottom: 10px; }
+    .feature-card p { font-size: 14px; color: #6a7d93; line-height: 1.6; }
+
+    /* ===== DOCTORS SECTION ===== */
+    .doctors-section { background: #f7fafd; padding: 80px; }
+    .doctors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .doc-card {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(15,28,46,0.07);
+      transition: all 0.25s;
+    }
+    .doc-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(15,28,46,0.13); }
+    .doc-card-header {
+      height: 110px;
+      background: linear-gradient(135deg, #e8f4ff 0%, #e6f9f1 100%);
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .doc-card-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0094ff, #00c4a0);
+      border: 3px solid #fff;
+      position: absolute;
+      bottom: -28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 4px 12px rgba(0,148,255,0.2);
+    }
+    .doc-card-body { padding: 40px 20px 24px; text-align: center; }
+    .doc-card-name { font-weight: 700; font-size: 16px; color: #0f1c2e; }
+    .doc-card-spec { font-size: 13px; color: #7a8fa6; margin: 4px 0 12px; }
+    .doc-card-stars { color: #f59e0b; font-size: 13px; }
+    .book-btn {
+      display: block;
+      margin: 14px 20px 20px;
+      padding: 10px;
+      background: #f0f7ff;
+      color: #0094ff;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .book-btn:hover { background: #0094ff; color: #fff; }
+
+    /* ===== HOW IT WORKS ===== */
+    .steps-section { padding: 80px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative; }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: 60px; right: 60px;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, #dde4ef 0px, #dde4ef 6px, transparent 6px, transparent 14px);
+      z-index: 0;
+    }
+    .step { text-align: center; position: relative; z-index: 1; }
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #0094ff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: #0094ff;
+      margin: 0 auto 18px;
+    }
+    .step h4 { font-size: 16px; font-weight: 600; color: #0f1c2e; margin-bottom: 8px; }
+    .step p { font-size: 13px; color: #6a7d93; line-height: 1.6; }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      margin: 0 80px 80px;
+      background: linear-gradient(135deg, #0f1c2e 0%, #1a3a5c 100%);
+      border-radius: 24px;
+      padding: 70px 80px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 40px;
+    }
+    .cta-section h2 { font-family: 'DM Serif Display', serif; font-size: 38px; color: #fff; margin-bottom: 12px; }
+    .cta-section p { color: #7a9ab8; font-size: 16px; }
+    .cta-actions { display: flex; gap: 14px; }
+    .btn-white {
+      background: #fff;
+      color: #0094ff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-white:hover { background: #e8f4ff; }
+    .btn-ghost {
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+
+    @media(max-width:900px){
+      .hero { grid-template-columns: 1fr; padding: 60px 32px; }
+      .hero-visual { display: none; }
+      .stats-bar { grid-template-columns: repeat(2,1fr); padding: 40px 32px; }
+      .section, .doctors-section, .steps-section { padding: 60px 32px; }
+      .features-grid, .doctors-grid, .steps-grid { grid-template-columns: repeat(2,1fr); }
+      .cta-section { margin: 0 32px 60px; padding: 50px 32px; grid-template-columns: 1fr; }
+      .steps-grid::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo">M+</div>
+      <span>MediCare<strong>+</strong></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="pages/doctors.html">Doctors</a>
+      <a href="#how">How it Works</a>
+    </div>
+    <div class="nav-actions">
+      <a href="pages/login.html" class="nav-link-btn">Sign In</a>
+      <a href="pages/register.html" class="nav-cta">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content" data-animate>
+      <div class="hero-badge"><span>✦</span> Trusted by 50,000+ patients</div>
+      <h1>Book a Doctor<br>Appointment <em>Instantly</em></h1>
+      <p>Connect with top-rated doctors near you. Easy scheduling, real-time availability, and seamless health management all in one place.</p>
+      <div class="hero-actions">
+        <a href="pages/register.html?role=patient" class="btn-primary">Book Appointment →</a>
+        <a href="pages/register.html?role=doctor" class="btn-outline">Join as Doctor</a>
+      </div>
+    </div>
+    <div class="hero-visual" data-animate-delay>
+      <div class="hero-card-stack">
+        <div class="hcard hcard-back"></div>
+        <div class="hcard hcard-main">
+          <div class="doc-info">
+            <div class="doc-avatar">👩‍⚕️</div>
+            <div>
+              <div class="doc-name">Dr. Priya Sharma</div>
+              <div class="doc-spec">Cardiologist · 12 yrs exp</div>
+              <div class="rating">
+                <span>★★★★★</span>
+                <span class="rating-num">4.9 (218 reviews)</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#7a8fa6;margin-bottom:8px;">Available Today</div>
+          <div class="appt-times">
+            <div class="time-slot">9:00 AM</div>
+            <div class="time-slot active">10:30 AM</div>
+            <div class="time-slot">12:00 PM</div>
+            <div class="time-slot">2:00 PM</div>
+            <div class="time-slot">3:30 PM</div>
+            <div class="time-slot">5:00 PM</div>
+          </div>
+        </div>
+        <div class="hcard-mini hcard-stats">
+          <div class="mini-icon green">✓</div>
+          <div>
+            <div class="mini-label">Appointments Today</div>
+            <div class="mini-val">128</div>
+          </div>
+        </div>
+        <div class="hcard-mini hcard-booked">
+          <div class="mini-icon blue">📅</div>
+          <div>
+            <div class="mini-label">Slot Booked!</div>
+            <div class="mini-val">10:30 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">500<span>+</span></div>
+      <div class="stat-label">Verified Doctors</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">50<span>k+</span></div>
+      <div class="stat-label">Happy Patients</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">40<span>+</span></div>
+      <div class="stat-label">Specializations</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.9<span>★</span></div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <h2>Everything You Need</h2>
+      <p>A complete healthcare appointment platform built for patients and doctors alike.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon blue">🔍</div>
+        <h3>Find the Right Doctor</h3>
+        <p>Browse by specialty, location, and availability. Read reviews from verified patients to make informed decisions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon green">⚡</div>
+        <h3>Instant Booking</h3>
+        <p>Book appointments in under 60 seconds. Real-time availability with instant confirmation — no calls needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon purple">🔔</div>
+        <h3>Smart Reminders</h3>
+        <p>Never miss an appointment with automated reminders via SMS and email, sent at the right time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon blue">🩺</div>
+        <h3>Digital Health Records</h3>
+        <p>Access your complete appointment history and medical notes securely from any device, anytime.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon green">📊</div>
+        <h3>Doctor Dashboard</h3>
+        <p>Doctors get a powerful dashboard to manage schedules, patient records, and appointment flow effortlessly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon purple">🔒</div>
+        <h3>Secure & Private</h3>
+        <p>Your health data is encrypted and protected. We comply with healthcare privacy standards at every level.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCTORS -->
+  <section class="doctors-section" id="doctors">
+    <div class="section-header">
+      <h2>Meet Our Doctors</h2>
+      <p>Top-rated specialists ready to help you with expert care and compassion.</p>
+    </div>
+    <div class="doctors-grid">
+      <div class="doc-card">
+        <div class="doc-card-header"><div class="doc-card-avatar">👨‍⚕️</div></div>
+        <div class="doc-card-body">
+          <div class="doc-card-name">Dr. Arjun Mehta</div>
+          <div class="doc-card-spec">Cardiologist</div>
+          <div class="doc-card-stars">★★★★★ <span style="color:#7a8fa6;font-size:12px">4.9</span></div>
+        </div>
+        <a href="pages/register.html?role=patient" class="book-btn">Book Appointment</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-header" style="background:linear-gradient(135deg,#fce7f3,#fef3c7)"><div class="doc-card-avatar" style="background:linear-gradient(135deg,#ec4899,#f59e0b)">👩‍⚕️</div></div>
+        <div class="doc-card-body">
+          <div class="doc-card-name">Dr. Priya Sharma</div>
+          <div class="doc-card-spec">Neurologist</div>
+          <div class="doc-card-stars">★★★★★ <span style="color:#7a8fa6;font-size:12px">4.8</span></div>
+        </div>
+        <a href="pages/register.html?role=patient" class="book-btn">Book Appointment</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-header" style="background:linear-gradient(135deg,#d1fae5,#e0f2fe)"><div class="doc-card-avatar" style="background:linear-gradient(135deg,#10b981,#3b82f6)">👨‍⚕️</div></div>
+        <div class="doc-card-body">
+          <div class="doc-card-name">Dr. Sanjay Patel</div>
+          <div class="doc-card-spec">Orthopedic</div>
+          <div class="doc-card-stars">★★★★☆ <span style="color:#7a8fa6;font-size:12px">4.7</span></div>
+        </div>
+        <a href="pages/register.html?role=patient" class="book-btn">Book Appointment</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-header" style="background:linear-gradient(135deg,#ede9fe,#fce7f3)"><div class="doc-card-avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">👩‍⚕️</div></div>
+        <div class="doc-card-body">
+          <div class="doc-card-name">Dr. Meera Singh</div>
+          <div class="doc-card-spec">Dermatologist</div>
+          <div class="doc-card-stars">★★★★★ <span style="color:#7a8fa6;font-size:12px">5.0</span></div>
+        </div>
+        <a href="pages/register.html?role=patient" class="book-btn">Book Appointment</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="steps-section" id="how">
+    <div class="section-header">
+      <h2>How It Works</h2>
+      <p>Get your appointment booked in just a few simple steps.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Create Account</h4>
+        <p>Register as a patient or doctor in under 2 minutes with your basic details.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Find a Doctor</h4>
+        <p>Search by specialty or symptom and browse verified doctor profiles with reviews.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Pick a Time</h4>
+        <p>Choose from real-time available slots that fit your schedule perfectly.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Get Confirmed</h4>
+        <p>Receive instant booking confirmation and reminders before your appointment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <div>
+      <h2>Ready to take control of your health?</h2>
+      <p>Join thousands of patients and doctors on MediCare+. Free to sign up.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="pages/register.html?role=patient" class="btn-white">I'm a Patient</a>
+      <a href="pages/register.html?role=doctor" class="btn-ghost">I'm a Doctor</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="index.html" class="nav-brand" style="margin-bottom:12px;display:inline-flex">
+        <div class="nav-logo">M+</div>
+        <span>MediCare<strong>+</strong></span>
+      </a>
+      <p style="color:#7a8fa6;font-size:14px;margin-top:8px;">Connecting patients with the right care, every time.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Support</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-copy">© 2025 MediCare+. All rights reserved.</div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

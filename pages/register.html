@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — MediCare+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    .auth-right { padding: 40px; }
+    .auth-form-box { max-width: 500px; }
+    .step-indicator {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 28px;
+    }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    .step-dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
+    .step-dot.done { background: var(--success); }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; animation: fadeSlideUp 0.35s ease; }
+
+    .specialty-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .specialty-chip {
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-mid);
+    }
+    .specialty-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .specialty-chip.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+
+    .nav-btns {
+      display: flex; gap: 12px; margin-top: 6px;
+    }
+    .btn-next, .btn-back {
+      flex: 1;
+      padding: 13px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-next { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(0,148,255,0.25); }
+    .btn-next:hover { background: var(--primary-dark); }
+    .btn-back { background: var(--bg-soft); color: var(--text-mid); border: 1.5px solid var(--border); }
+    .btn-back:hover { background: var(--border); }
+
+    .password-strength { margin-top: 6px; }
+    .strength-bar { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; width: 0; }
+    .strength-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .profile-upload {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .profile-upload:hover { border-color: var(--primary); background: var(--primary-light); }
+    .upload-avatar {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      background: var(--bg-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .upload-text-main { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+    .upload-text-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="navbar">
+    <a href="../index.html" class="nav-brand">
+      <div class="nav-logo">M+</div>
+      <span>MediCare<strong>+</strong></span>
+    </a>
+    <div></div>
+    <div class="nav-actions">
+      <a href="login.html" class="nav-link-btn">Already have an account? <strong>Sign In</strong></a>
+    </div>
+  </nav>
+
+  <div class="auth-page">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="brand-mark">
+        <div class="nav-logo">M+</div>
+        <span>MediCare<strong>+</strong></span>
+      </div>
+      <h2>Join MediCare+<br>Today</h2>
+      <p>Create your account and start experiencing healthcare the modern way — simple, fast, and stress-free.</p>
+      <div class="auth-trust">
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <div class="trust-text">Your data is encrypted and secure</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">✅</div>
+          <div class="trust-text">All doctors are verified professionals</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⚡</div>
+          <div class="trust-text">Book appointments in under 60 seconds</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🌟</div>
+          <div class="trust-text">Trusted by 50,000+ patients & 500+ doctors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+      <div class="auth-form-box">
+        <h1>Create Account</h1>
+        <p class="subtitle">Already have an account? <a href="login.html">Sign in</a></p>
+
+        <!-- STEP INDICATOR -->
+        <div class="step-indicator">
+          <div class="step-dot active" id="dot-1"></div>
+          <div class="step-dot" id="dot-2"></div>
+          <div class="step-dot" id="dot-3"></div>
+          <span style="font-size:13px;color:var(--text-muted);margin-left:8px" id="step-label">Step 1 of 3</span>
+        </div>
+
+        <form id="registerForm">
+          <!-- STEP 1: Role Selection -->
+          <div class="form-section active" id="step-1">
+            <p style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:16px">I am registering as a...</p>
+            <div class="role-tabs" id="roleTabs">
+              <div class="role-tab" data-role="patient" onclick="selectRole('patient')">
+                <span class="role-tab-icon">🧑‍💼</span>
+                <div class="role-tab-label">Patient</div>
+                <div class="role-tab-sub">Book appointments & manage health</div>
+              </div>
+              <div class="role-tab" data-role="doctor" onclick="selectRole('doctor')">
+                <span class="role-tab-icon">👨‍⚕️</span>
+                <div class="role-tab-label">Doctor</div>
+                <div class="role-tab-sub">Manage schedule & see patients</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name <span>*</span></label>
+                <div class="input-wrap">
+                  <span class="input-icon">👤</span>
+                  <input type="text" data-icon id="firstName" placeholder="Arjun" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Last Name <span>*</span></label>
+                <div class="input-wrap">
+                  <span class="input-icon">👤</span>
+                  <input type="text" data-icon id="lastName" placeholder="Mehta" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email Address <span>*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">✉️</span>
+                <input type="email" data-icon id="email" placeholder="you@example.com" required>
+              </div>
+              <div class="form-error" id="emailError">Please enter a valid email address.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Mobile Number <span>*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📱</span>
+                <input type="tel" data-icon id="phone" placeholder="+91 98765 43210" required>
+              </div>
+            </div>
+
+            <button type="button" class="btn-next" onclick="goToStep(2)">Continue →</button>
+          </div>
+
+          <!-- STEP 2: Account Details -->
+          <div class="form-section" id="step-2">
+            <div class="form-group">
+              <label>Date of Birth</label>
+              <div class="input-wrap">
+                <span class="input-icon">🎂</span>
+                <input type="date" data-icon id="dob">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Gender</label>
+                <div class="input-wrap">
+                  <span class="input-icon">⚧</span>
+                  <select data-icon id="gender">
+                    <option value="">Select gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Non-binary</option>
+                    <option>Prefer not to say</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Blood Group</label>
+                <div class="input-wrap">
+                  <span class="input-icon">🩸</span>
+                  <select data-icon id="bloodGroup">
+                    <option value="">Select type</option>
+                    <option>A+</option><option>A−</option>
+                    <option>B+</option><option>B−</option>
+                    <option>AB+</option><option>AB−</option>
+                    <option>O+</option><option>O−</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doctor-specific fields -->
+            <div id="doctorFields" style="display:none">
+              <div class="form-group">
+                <label>Specialization <span>*</span></label>
+                <div class="specialty-grid" id="specialtyGrid">
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Cardiologist</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Neurologist</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Orthopedic</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Dermatologist</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Pediatrician</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Psychiatrist</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Gynecologist</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">General Physician</div>
+                  <div class="specialty-chip" onclick="selectSpecialty(this)">Other</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Medical License No. <span>*</span></label>
+                  <div class="input-wrap">
+                    <span class="input-icon">🪪</span>
+                    <input type="text" data-icon id="licenseNo" placeholder="MCI-2024-XXXXX">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Years of Experience</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">📅</span>
+                    <input type="number" data-icon id="experience" min="0" max="60" placeholder="10">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Hospital / Clinic Name</label>
+                <div class="input-wrap">
+                  <span class="input-icon">🏥</span>
+                  <input type="text" data-icon id="hospital" placeholder="Apollo Hospital, Mumbai">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Consultation Fee (₹)</label>
+                <div class="input-wrap">
+                  <span class="input-icon">💰</span>
+                  <input type="number" data-icon id="fee" placeholder="500" min="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Patient-specific -->
+            <div id="patientFields">
+              <div class="form-group">
+                <label>Address / City</label>
+                <div class="input-wrap">
+                  <span class="input-icon">📍</span>
+                  <input type="text" data-icon id="address" placeholder="Mathura, Uttar Pradesh">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Emergency Contact</label>
+                <div class="input-wrap">
+                  <span class="input-icon">📞</span>
+                  <input type="tel" data-icon id="emergency" placeholder="+91 98765 00000">
+                </div>
+              </div>
+            </div>
+
+            <div class="nav-btns">
+              <button type="button" class="btn-back" onclick="goToStep(1)">← Back</button>
+              <button type="button" class="btn-next" onclick="goToStep(3)">Continue →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3: Password & Confirm -->
+          <div class="form-section" id="step-3">
+            <div class="form-group">
+              <label>Create Password <span>*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" data-icon id="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)">
+                <button type="button" class="input-icon-right" onclick="togglePwd('password')">👁</button>
+              </div>
+              <div class="password-strength">
+                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                <div class="strength-text" id="strengthText"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password <span>*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" data-icon id="confirmPassword" placeholder="Repeat password">
+                <button type="button" class="input-icon-right" onclick="togglePwd('confirmPassword')">👁</button>
+              </div>
+              <div class="form-error" id="pwdError">Passwords do not match.</div>
+            </div>
+
+            <div class="form-group">
+              <label>Short Bio / About <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+              <textarea id="bio" placeholder="Tell us a bit about yourself..."></textarea>
+            </div>
+
+            <div class="agree-row">
+              <input type="checkbox" id="agreeTerms" required>
+              <label for="agreeTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of MediCare+</label>
+            </div>
+
+            <div class="nav-btns">
+              <button type="button" class="btn-back" onclick="goToStep(2)">← Back</button>
+              <button type="submit" class="btn-next btn-submit" id="submitBtn">Create Account 🎉</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  let currentStep = 1;
+  let selectedRole = 'patient';
+  let selectedSpecialty = '';
+
+  const urlParams = new URLSearchParams(location.search);
+  if (urlParams.get('role') === 'doctor') selectRole('doctor');
+  else selectRole('patient');
+
+  function selectRole(role) {
+    selectedRole = role;
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    const tab = document.querySelector(`.role-tab[data-role="${role}"]`);
+    if (tab) tab.classList.add('active');
+  }
+
+  function selectSpecialty(el) {
+    document.querySelectorAll('.specialty-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    selectedSpecialty = el.textContent.trim();
+  }
+
+  // ✅ VALIDATION FUNCTIONS
+  function isValidName(name) {
+    return /^[A-Za-z]{2,}$/.test(name);
+  }
+
+  function isValidEmail(email) {
+    return /^\S+@\S+\.\S+$/.test(email);
+  }
+
+  function isValidPhone(phone) {
+    return /^[6-9]\d{9}$/.test(phone.replace(/\D/g, ''));
+  }
+
+  function isValidLicense(lic) {
+    return /^[A-Za-z0-9-]{5,}$/.test(lic);
+  }
+
+  function isValidPassword(pwd) {
+    return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pwd);
+  }
+
+  function goToStep(n) {
+    if (n === 2) {
+      const fname = document.getElementById('firstName').value.trim();
+      const lname = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!fname || !lname || !email || !phone) {
+        showToast('Please fill all required fields.', 'error'); return;
+      }
+
+      if (!isValidName(fname) || !isValidName(lname)) {
+        showToast('Name should contain only letters (min 2 characters).', 'error'); return;
+      }
+
+      if (!isValidEmail(email)) {
+        showToast('Invalid email format.', 'error'); return;
+      }
+
+      if (!isValidPhone(phone)) {
+        showToast('Enter valid 10-digit Indian mobile number.', 'error'); return;
+      }
+
+      document.getElementById('doctorFields').style.display = selectedRole === 'doctor' ? 'block' : 'none';
+      document.getElementById('patientFields').style.display = selectedRole === 'patient' ? 'block' : 'none';
+    }
+
+    if (n === 3) {
+      if (selectedRole === 'doctor') {
+        if (!selectedSpecialty) {
+          showToast('Please select a specialization.', 'error'); return;
+        }
+
+        const license = document.getElementById('licenseNo').value.trim();
+        const exp = document.getElementById('experience').value;
+
+        if (!isValidLicense(license)) {
+          showToast('Enter valid license number.', 'error'); return;
+        }
+
+        if (exp && (exp < 0 || exp > 60)) {
+          showToast('Experience must be between 0–60 years.', 'error'); return;
+        }
+      }
+
+      const emergency = document.getElementById('emergency').value;
+      if (selectedRole === 'patient' && emergency && !isValidPhone(emergency)) {
+        showToast('Invalid emergency contact number.', 'error'); return;
+      }
+    }
+
+    currentStep = n;
+    document.querySelectorAll('.form-section').forEach((s, i) => {
+      s.classList.toggle('active', i + 1 === n);
+    });
+    updateDots();
+    document.querySelector('.auth-right').scrollTop = 0;
+  }
+
+  function updateDots() {
+    for (let i = 1; i <= 3; i++) {
+      const d = document.getElementById('dot-' + i);
+      d.classList.remove('active', 'done');
+      if (i < currentStep) d.classList.add('done');
+      else if (i === currentStep) d.classList.add('active');
+    }
+    document.getElementById('step-label').textContent = `Step ${currentStep} of 3`;
+  }
+
+  function togglePwd(id) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const colors = ['','#ef4444','#f59e0b','#0094ff','#10b981'];
+    const labels = ['','Weak','Fair','Good','Strong'];
+
+    fill.style.width = (score / 4 * 100) + '%';
+    fill.style.background = colors[score];
+    text.textContent = val ? labels[score] : '';
+    text.style.color = colors[score];
+  }
+
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const pwd = document.getElementById('password').value;
+    const cpwd = document.getElementById('confirmPassword').value;
+
+    if (!isValidPassword(pwd)) {
+      showToast('Password must be strong (8+ chars, uppercase, number, symbol).', 'error');
+      return;
+    }
+
+    if (pwd !== cpwd) {
+      showToast('Passwords do not match!', 'error');
+      return;
+    }
+
+    if (!document.getElementById('agreeTerms').checked) {
+      showToast('Please agree to the terms.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Creating account...';
+    btn.classList.add('loading');
+
+    const payload = {
+      name: `${firstName.value} ${lastName.value}`,
+      email: email.value,
+      password: pwd,
+      role: selectedRole,
+      phone: phone.value.replace(/\D/g, ''),
+      dob: dob.value,
+      gender: gender.value,
+      bloodGroup: bloodGroup.value,
+      bio: bio.value,
+      ...(selectedRole === 'doctor' ? {
+        specialty: selectedSpecialty,
+        licenseNo: licenseNo.value,
+        experience: Number(experience.value),
+        hospital: hospital.value,
+        fee: Number(fee.value)
+      } : {
+        address: address.value,
+        emergency: emergency.value.replace(/\D/g, '')
+      })
+    };
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast('Account created! Redirecting...', 'success');
+        setTimeout(() => window.location.href = 'login.html?registered=1', 1500);
+      } else {
+        showToast(data.error || 'Registration failed.', 'error');
+      }
+
+    } catch {
+      showToast('Server not reachable.', 'error');
+    }
+
+    btn.textContent = 'Create Account 🎉';
+    btn.classList.remove('loading');
+  });
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' toast-'+type : '');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>
