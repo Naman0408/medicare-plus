@@ -165,77 +165,88 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    let loginRole = 'patient';
+  let loginRole = 'patient';
 
-    // Show success banner if redirected from registration
-    if (new URLSearchParams(location.search).get('registered') === '1') {
-      document.getElementById('successBanner').classList.add('show');
+  // Show success banner after registration
+  if (new URLSearchParams(location.search).get('registered') === '1') {
+    document.getElementById('successBanner').classList.add('show');
+  }
+
+  function setLoginRole(role) {
+    loginRole = role;
+    document.querySelectorAll('#loginRoleTabs .role-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`#loginRoleTabs .role-tab[data-role="${role}"]`).classList.add('active');
+  }
+
+  function togglePwd() {
+    const inp = document.getElementById('loginPwd');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function showForgot(e) {
+    e.preventDefault();
+    showToast('Password reset feature coming soon!', 'info');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const pwd = document.getElementById('loginPwd').value;
+    const btn = document.getElementById('loginBtn');
+
+    if (!email || !pwd) {
+      showToast('Please fill in all fields.', 'error');
+      return;
     }
 
-    function setLoginRole(role) {
-      loginRole = role;
-      document.querySelectorAll('#loginRoleTabs .role-tab').forEach(t => t.classList.remove('active'));
-      document.querySelector(`#loginRoleTabs .role-tab[data-role="${role}"]`).classList.add('active');
-    }
+    btn.textContent = 'Signing in...';
+    btn.classList.add('loading');
 
-    function togglePwd() {
-      const inp = document.getElementById('loginPwd');
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-    }
+    try {
+      const res = await fetch('https://medicare-backend-6b1t.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pwd })
+      });
 
-    function showForgot(e) {
-      e.preventDefault();
-      showToast('Password reset email sent! (Demo mode)', 'success');
-    }
+      const data = await res.json();
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const pwd = document.getElementById('loginPwd').value;
-      const btn = document.getElementById('loginBtn');
-
-      if (!email || !pwd) { showToast('Please fill in all fields.', 'error'); return; }
-      btn.textContent = 'Signing in...';
-      btn.classList.add('loading');
-
-      try {
-        const res = await fetch('http://localhost:5000/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password: pwd, role: loginRole })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          const user = data.user || {};
-          const resolvedRole = user.role || loginRole;
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('userRole', resolvedRole);
-          localStorage.setItem("demoRole", resolvedRole); // doctor or patient
-          localStorage.setItem("demoUser", JSON.stringify(user));
-          showToast('Welcome back! Redirecting...', 'success');
-          setTimeout(() => window.location.href = `dashboard-${resolvedRole}.html`, 1200);
-        } else {
-          showToast(data.error || 'Invalid credentials.', 'error');
-          btn.textContent = 'Sign In →';
-          btn.classList.remove('loading');
-        }
-      } catch(err) {
-        // Demo mode
-        localStorage.setItem('demoRole', loginRole);
-        localStorage.setItem('demoUser', JSON.stringify({ name: email.split('@')[0], email, role: loginRole }));
-        showToast('Signed in! (Demo mode)', 'success');
-        setTimeout(() => window.location.href = `dashboard-${loginRole}.html`, 1200);
+      if (!res.ok) {
+        showToast(data.error || 'Invalid credentials.', 'error');
         btn.textContent = 'Sign In →';
         btn.classList.remove('loading');
+        return;
       }
-    });
 
-    function showToast(msg, type='') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast show' + (type ? ' toast-'+type : '');
-      setTimeout(() => t.classList.remove('show'), 3500);
+      // ✅ SUCCESS LOGIN
+      const user = data.user || {};
+      const role = user.role || loginRole;
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      showToast('Welcome back! Redirecting...', 'success');
+
+      setTimeout(() => {
+        window.location.href = `dashboard-${role}.html`;
+      }, 1200);
+
+    } catch (err) {
+      // ❌ NO DEMO MODE — REAL ERROR
+      showToast('Server error. Please try again.', 'error');
+      btn.textContent = 'Sign In →';
+      btn.classList.remove('loading');
     }
-  </script>
+  });
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' toast-' + type : '');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+</script>
 </body>
 </html>
