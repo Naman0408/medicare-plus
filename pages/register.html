@@ -400,70 +400,60 @@
     return /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pwd);
   }
 
-  function goToStep(n) {
-    if (n === 2) {
-      const fname = document.getElementById('firstName').value.trim();
-      const lname = document.getElementById('lastName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
+function goToStep(n) {
 
-      if (!fname || !lname || !email || !phone) {
-        showToast('Please fill all required fields.', 'error'); return;
-      }
+  if (n === 2) {
+    const fname = document.getElementById('firstName').value.trim();
+    const lname = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
 
-      if (!/^[A-Za-z]{2,20}$/.test(fname)) {
-        showToast('First name must be 2–20 letters only.', 'error');
-        return;
-      }
-
-      if (!/^[A-Za-z]{2,20}$/.test(lname)) {
-        showToast('Last name must be 2–20 letters only.', 'error');
-        return;
-      }
-
-      if (!isValidEmail(email)) {
-        showToast('Invalid email format.', 'error'); return;
-      }
-
-      if (!isValidPhone(phone)) {
-        showToast('Enter valid 10-digit Indian mobile number.', 'error'); return;
-      }
-
-      document.getElementById('doctorFields').style.display = selectedRole === 'doctor' ? 'block' : 'none';
-      document.getElementById('patientFields').style.display = selectedRole === 'patient' ? 'block' : 'none';
+    if (!fname || !lname || !email || !phone) {
+      showToast('Please fill all required fields.', 'error');
+      return false;
     }
 
-    if (n === 3) {
-      if (selectedRole === 'doctor') {
-        if (!selectedSpecialty) {
-          showToast('Please select a specialization.', 'error'); return;
-        }
-
-        const license = document.getElementById('licenseNo').value.trim();
-        const exp = document.getElementById('experience').value;
-
-        if (!isValidLicense(license)) {
-          showToast('Enter valid license number.', 'error'); return;
-        }
-
-        if (exp && (exp < 0 || exp > 60)) {
-          showToast('Experience must be between 0–60 years.', 'error'); return;
-        }
-      }
-
-      const emergency = document.getElementById('emergency').value;
-      if (selectedRole === 'patient' && emergency && !isValidPhone(emergency)) {
-        showToast('Invalid emergency contact number.', 'error'); return;
-      }
+    // FIRST NAME CHECK
+    if (!/^[A-Za-z]{2,20}$/.test(fname)) {
+      showToast('First name must be 2-20 letters only.', 'error');
+      return;
     }
 
-    currentStep = n;
-    document.querySelectorAll('.form-section').forEach((s, i) => {
-      s.classList.toggle('active', i + 1 === n);
-    });
-    updateDots();
-    document.querySelector('.auth-right').scrollTop = 0;
+    // LAST NAME CHECK (STRICT)
+    if (!/^[A-Za-z]{2,15}$/.test(lname)) {
+      showToast('Last name must be 2-15 letters only.', 'error');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      showToast('Invalid email format.', 'error');
+      return false;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(phone.replace(/\D/g, ''))) {
+      showToast('Enter valid 10-digit mobile number.', 'error');
+      return false;
+    }
   }
+
+  if (n === 3) {
+    if (selectedRole === 'doctor' && !selectedSpecialty) {
+      showToast('Please select a specialization.', 'error');
+      return false;
+    }
+  }
+
+  // ✅ ONLY RUNS IF ALL VALIDATIONS PASS
+  currentStep = n;
+
+  document.querySelectorAll('.form-section').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === n);
+  });
+
+  updateDots();
+  document.querySelector('.auth-right').scrollTop = 0;
+}
+
 
   function updateDots() {
     for (let i = 1; i <= 3; i++) {
