@@ -411,8 +411,14 @@
         showToast('Please fill all required fields.', 'error'); return;
       }
 
-      if (!isValidName(fname) || !isValidName(lname)) {
-        showToast('Name must be 2-20 letters only.', 'error');      
+      if (!/^[A-Za-z]{2,20}$/.test(fname)) {
+        showToast('First name must be 2–20 letters only.', 'error');
+        return;
+      }
+
+      if (!/^[A-Za-z]{2,20}$/.test(lname)) {
+        showToast('Last name must be 2–20 letters only.', 'error');
+        return;
       }
 
       if (!isValidEmail(email)) {
