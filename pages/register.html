@@ -436,12 +436,37 @@ function goToStep(n) {
     }
   }
 
-  if (n === 3) {
-    if (selectedRole === 'doctor' && !selectedSpecialty) {
-      showToast('Please select a specialization.', 'error');
-      return false;
+    if (n === 3) {
+
+      const dob = document.getElementById('dob').value;
+      const gender = document.getElementById('gender').value;
+      const emergency = document.getElementById('emergency').value.trim();
+
+      // ❌ DOB future check
+      if (dob) {
+        const today = new Date().toISOString().split('T')[0];
+        if (dob > today) {
+          showToast('Date of birth cannot be in future.', 'error');
+          return;
+        }
+      }
+
+      // ❌ Emergency number check (ONLY numbers allowed)
+      if (selectedRole === 'patient') {
+        if (!/^[6-9]\d{9}$/.test(emergency.replace(/\D/g, ''))) {
+          showToast('Enter valid emergency contact number.', 'error');
+          return;
+        }
+      }
+
+      // ❌ Doctor validation
+      if (selectedRole === 'doctor') {
+        if (!selectedSpecialty) {
+          showToast('Please select a specialization.', 'error');
+          return;
+        }
+      }
     }
-  }
 
   // ✅ ONLY RUNS IF ALL VALIDATIONS PASS
   currentStep = n;
